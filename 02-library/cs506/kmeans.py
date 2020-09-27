@@ -115,7 +115,9 @@ def generate_k_pp(dataset, k):
     """
     
     centers = [];
-    for i in range(k):
+    tmp = random.randint(0, len(dataset)-1);
+    centers.append(dataset[tmp]);
+    for i in range(k-1):
         centers.append(findMinDistance(centers, dataset));
     return centers;
     # raise NotImplementedError()
@@ -125,7 +127,7 @@ def findMinDistance(centers, dataset):
     res = [];
     for i in range(len(centers)):
         for j in range(len(dataset)):
-            if (!dataset[j] in centers):
+            if (dataset[j] not in centers):
                 if minVal > distance(centers[i],dataset[j]):
                     res = dataset[j];
                     minVal = distance(centers[i],dataset[j]);
