@@ -11,7 +11,12 @@ def point_avg(points):
     
     Returns a new point which is the center of all the points.
     """
-    raise NotImplementedError()
+    x = 0;
+    y = 0;
+    for i in range(len(points)):
+        x += points[i][0];
+        y += points[i][1];
+    return [x/len(points), y/len(points)];
 
 
 def update_centers(dataset, assignments):
@@ -21,7 +26,22 @@ def update_centers(dataset, assignments):
     Compute the center for each of the assigned groups.
     Return `k` centers in a list
     """
-    raise NotImplementedError()
+    k = 0;
+    for i in range(len(assignments)):
+        k = max(k, assignments[i]);
+
+    points = [];
+    for i in range(k+1):
+        points.append([]);
+
+    for i in range(len(assignments)):
+        points[assignments[i]].append(dataset[i]);
+
+    centers = [];
+    for i in range(len(points)):
+        centers.append(point_avg(points[i]));
+
+    return centers;
 
 def assign_points(data_points, centers):
     """
@@ -43,20 +63,47 @@ def distance(a, b):
     """
     Returns the Euclidean distance between a and b
     """
-    raise NotImplementedError()
+    res = 0
+    for i in range(len(a)):
+        res += (a[i]-b[i]) ** 2
+    return res ** 0.5
 
 def distance_squared(a, b):
-    raise NotImplementedError()
+    res = 0
+    for i in range(len(a)):
+        res += (a[i]-b[i]) ** 2
+    return res
 
 def generate_k(dataset, k):
     """
     Given `data_set`, which is an array of arrays,
     return a random set of k points from the data_set
     """
-    raise NotImplementedError()
+    res = [];
+    used = [];
+    while (len(res) < k) :
+        tmp = random.randint(0, len(dataset)-1);
+        if (tmp not in used):
+            used.append(tmp);
+            res.append(dataset[tmp]);
+    return res;
 
 def cost_function(clustering):
-    raise NotImplementedError()
+    centers = {};
+    distances = [0 for i in range(len(clustering))];
+    for i in clustering:
+        centers[i] = point_avg(clustering[i]);
+
+    for i in clustering:
+        for point in clustering[i]:
+            distances[i] += distance_squared(point, centers[i]);
+
+    res = 0;
+    for i in range(len(distances)):
+        distances[i] **= 0.5;
+        res += distances[i];
+
+    return res;
 
 
 def generate_k_pp(dataset, k):
@@ -66,7 +113,25 @@ def generate_k_pp(dataset, k):
     where points are picked with a probability proportional
     to their distance as per kmeans pp
     """
-    raise NotImplementedError()
+    
+    centers = [];
+    for i in range(k):
+        centers.append(findMinDistance(centers, dataset));
+    return centers;
+    # raise NotImplementedError()
+
+def findMinDistance(centers, dataset):
+    minVal = 2147483647;
+    res = [];
+    for i in range(len(centers)):
+        for j in range(len(dataset)):
+            if (!dataset[j] in centers):
+                if minVal > distance(centers[i],dataset[j]):
+                    res = dataset[j];
+                    minVal = distance(centers[i],dataset[j]);
+    return res;
+
+
 
 
 def _do_lloyds_algo(dataset, k_points):
@@ -96,3 +161,6 @@ def k_means_pp(dataset, k):
 
     k_points = generate_k_pp(dataset, k)
     return _do_lloyds_algo(dataset, k_points)
+
+# test = [[179,260],[298,317],[381,464],[387,459],[507,634],[243,291],[256,288]];
+# generate_k_pp(test, 2);
